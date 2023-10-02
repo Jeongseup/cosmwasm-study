@@ -3,10 +3,6 @@ name = "counting-contract"
 version = "0.1.0"
 edition = "2021"
 
-[alias]
-wasm = "build --release --target wasm32-unknown-unknown"
-wasm-debug = "build --target wasm32-unknown-unknown"
-
 [lib]
 crate-type = ["cdylib", "rlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
