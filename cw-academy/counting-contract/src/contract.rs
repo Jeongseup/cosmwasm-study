@@ -24,8 +24,11 @@ pub mod query {
 }
 
 pub mod exec {
-    use crate::state::{COUNTER, MINIMAL_DONATION, OWNER};
-    use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdError, StdResult};
+    use crate::{
+        error::ContractError,
+        state::{COUNTER, MINIMAL_DONATION, OWNER},
+    };
+    use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdResult};
 
     pub fn donate(deps: DepsMut, info: MessageInfo) -> StdResult<Response> {
         let minimal_donation = MINIMAL_DONATION.load(deps.storage)?;
@@ -48,10 +51,12 @@ pub mod exec {
         Ok(resp)
     }
 
-    pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
+    pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
         let owner = OWNER.load(deps.storage)?;
         if info.sender != owner {
-            return Err(StdError::generic_err("Unauthorized"));
+            return Err(ContractError::Unauthorized {
+                owner: owner.into_string(),
+            });
         }
         let funds = deps.querier.query_all_balances(&env.contract.address)?;
         let bank_msg = BankMsg::Send {
